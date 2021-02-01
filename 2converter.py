@@ -11,7 +11,9 @@ import os
 
 file = open('index.ipynb', 'r') 
 out_file = open('index.md','w')
-code_file = open('make_graphs.py', 'w').close()
+code_file = open('make_graphs.py', 'w')
+code_file.write('import plotly.io as io\n')
+code_file.close()
 
 
 out_file.write(
@@ -71,7 +73,6 @@ def write_code():
 
     # arr = code.split('"')[:-1]
     # for t in arr:
-    code_file.write('import plotly.io as io\n')
     code_file.write(code)
     # code_file.write('fig.write_html("html_plotly.html", full_html = False)\n')
     code_file.write('io.write_html(fig, "assets/graphs/graph%d.html", full_html = False, include_plotlyjs = False)\n' % count)

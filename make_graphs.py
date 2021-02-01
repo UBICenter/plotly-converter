@@ -199,7 +199,6 @@ fig.update_layout(
 fig.update(layout_showlegend=False)
 
 io.write_html(fig, "assets/graphs/graph1.html", full_html = False, include_plotlyjs = False)
-import plotly.io as io
 pov = pd.DataFrame({
     'effect_pp': [-2.1, -3.9, 3.8, -14.9, -8.3, -4.1, -0.5],
     'baseline_pp': [93, 88, 68, 82, 44, 94, 92],
