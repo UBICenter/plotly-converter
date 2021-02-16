@@ -8,9 +8,10 @@
 # print(type(nb))
 
 import os
+title = '2020-07-07-adult-child-ubi'
 
-file = open('index.ipynb', 'r') 
-out_file = open('index.md','w')
+file = open('adult_child_ubi.ipynb', 'r') 
+out_file = open('%s.md' % title,'w')
 code_file = open('make_graphs.py', 'w')
 code_file.write('import plotly.io as io\n')
 code_file.close()
@@ -20,14 +21,14 @@ out_file.write(
 """---
 layout: post
 current: post
-cover: assets/images/bear.jpg
+cover: 
 navigation: True
-title: A Full and Comprehensive Style Test
-date: 2012-09-01 10:00:00
-tags:
+title: To minimize poverty, should UBI be provided for adults, children, or both?
+date: 2020-07-07
+tags: [blog]
 class: post-template
 subclass: 'post'
-author: john
+author: nate
 ---
 """)
 
@@ -69,13 +70,15 @@ def write_code():
             # print(bit)
             code += bit
     code = code.replace("\\\"", '\'')
+    code = code[:-1][:-1]
+    code += '\n'
     # print(code)
 
     # arr = code.split('"')[:-1]
     # for t in arr:
     code_file.write(code)
     # code_file.write('fig.write_html("html_plotly.html", full_html = False)\n')
-    code_file.write('io.write_html(fig, "assets/graphs/graph%d.html", full_html = False, include_plotlyjs = False)\n' % count)
+    code_file.write('io.write_html(fig, "assets/graphs/%s-graph%d.html", full_html = False, include_plotlyjs = False)\n' % (title, count))
     code_file.close()
 
     os.system('python make_graphs.py')
@@ -110,11 +113,11 @@ function f%d() {
 <div>
   <script>
     $(document).ready(function(){
-      $("#graph%d").load("assets/graphs/graph%d.html");
+      $("#graph%d").load("{{site.baseurl}}assets/graphs/%s-graph%d.html");
     });
   </script>
 </div>
-<div id = "graph%d"></div>\n""" % (count, count, count))
+<div id = "graph%d"></div>\n""" % (count, title, count, count))
 
     # out_file.write('<object type="text/html" data="graph%d.html"></object>\n' % count)
     # out_file.write('\n')
@@ -139,7 +142,9 @@ for line in file:
                 # text_sections.append((count, source))
                 write_text()
             # count += 1
-        elif not 'fig.show' in line:
+        elif 'fig.show' in line:
+            source.append('xx')
+        else:
             # print('append')
             source.append(line)
 
