@@ -1,4 +1,10 @@
 import plotly.io as io
+from pathlib import Path
+
+folder_path = Path('..', 'ubicenter.org', 'assets', 'graphs', '2020-07-07-adult-child-ubi')
+
+folder_path.mkdir(parents = True, exist_ok = True)
+
 ### LOAD PACKAGES ####
 
 import pandas as pd
@@ -145,14 +151,14 @@ program = (pd.melt(overall_df, 'spending_in_billions',
                    var_name='ubi_type',value_name='poverty_rate'))
 
 def melt_dict(d):
-  ''' produce long version of data frame represented by dictionary (d).
+  """ produce long version of data frame represented by dictionary (d).
   
   Arguments
   d: Dictionary where each element represents a differnt UBI type and spending levels and the poverty impacts.
   
   Returns
   DataFrame where every row is the combination of UBI type and spending level.
-  '''
+  """
   df = pd.DataFrame(d).round(3) * 100
   program = pd.melt(df, 'spending_in_billions', var_name='ubi_type',value_name='poverty_rate')
   program['ubi_type'] = program.ubi_type.map({'child_allowance': 'Child allowance',
@@ -165,7 +171,7 @@ program_child = melt_dict(child)
 program_adult = melt_dict(adult)
 
 def line_graph(df, x, y, color, title, xaxis_title, yaxis_title):
-    '''Style for line graphs.
+    """Style for line graphs.
     
     Arguments
     df: DataFrame with data to be plotted.
@@ -177,7 +183,7 @@ def line_graph(df, x, y, color, title, xaxis_title, yaxis_title):
     
     Returns
     Nothing. Shows the plot.
-    '''
+    """
     fig = px.line(df, x=x, y=y, color=color)
     fig.update_layout(
         title=title,
@@ -202,16 +208,19 @@ fig = line_graph(df=program_overall, x='spending_in_billions',
            title='Overall poverty rate and spending on cash transfer programs',
            xaxis_title='Spending in billions',
            yaxis_title='SPM poverty rate')
-io.write_html(fig, "assets/graphs/2020-07-07-adult-child-ubi-graph1.html", full_html = False, include_plotlyjs = False)
+io.write_html(fig, str(folder_path.joinpath('2020-07-07-adult-child-ubi-graph-1.html')), full_html = False, include_plotlyjs = False)
+
 fig = line_graph(df=program_child, x='spending_in_billions', 
            y='poverty_rate', color='ubi_type',
            title='Child poverty rate and spending on cash transfer programs',
            xaxis_title='Spending in billions',
            yaxis_title='SPM poverty rate among people aged 17 and under')
-io.write_html(fig, "assets/graphs/2020-07-07-adult-child-ubi-graph2.html", full_html = False, include_plotlyjs = False)
+io.write_html(fig, str(folder_path.joinpath('2020-07-07-adult-child-ubi-graph-2.html')), full_html = False, include_plotlyjs = False)
+
 fig = line_graph(df=program_adult, x='spending_in_billions', 
            y='poverty_rate', color='ubi_type',
            title='Adult poverty rate and spending on cash transfer programs',
            xaxis_title='Spending in billions',
            yaxis_title='SPM poverty rate among people aged 18 and over')
-io.write_html(fig, "assets/graphs/2020-07-07-adult-child-ubi-graph3.html", full_html = False, include_plotlyjs = False)
+io.write_html(fig, str(folder_path.joinpath('2020-07-07-adult-child-ubi-graph-3.html')), full_html = False, include_plotlyjs = False)
+
