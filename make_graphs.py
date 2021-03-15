@@ -1,7 +1,7 @@
 import plotly.io as io
 from pathlib import Path
 
-folder_path = Path('/Users/mattgilbert/Documents/UBIcenter/ubicenter.org/assets/markdown_assets/2021-01-18_racial_poverty_disparities_mlk_day_2021')
+folder_path = Path('../ubicenter.org/assets/markdown_assets/2021-01-18_racial_poverty_disparities_mlk_day_2021')
 
 import pandas as pd
 import numpy as np

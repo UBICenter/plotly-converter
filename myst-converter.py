@@ -76,10 +76,10 @@ author:
 """
 
 # convert notebook to myst
-subprocess.run(['jupytext', notebook_path, '--to', 'myst'])
+subprocess.run(['jupytext', notebook_path, '--to', 'myst', '-o', 'temp.md'])
 
 # open myst file
-file = open('%s.md' % notebook_path.parent.joinpath(title), 'r') 
+file = open('temp.md', 'r') 
 
 # update the title if necessary to make it meet jekyll requirements
 title = title.replace('_', '-')
@@ -121,7 +121,7 @@ code_file.write("\nfolder_path = Path('%s')\n" % assets_dir)
 def add_code_start(count):
   out_file.write("""
 <button onclick="f%d()">Click to show code</button>
-<div id="graph_code_%d" style="display: none;">
+<div id="asset_code_%d" style="display: none;">
   <pre>
     <code>
 """ % (count, count))
@@ -136,7 +136,7 @@ def add_code_end(block, count):
 
 <script>
 function f%d() {
-  var x = document.getElementById("graph_code_%d");
+  var x = document.getElementById("asset_code_%d");
   if (x.style.display === "none") {
     x.style.display = "block";
   } else {
@@ -149,21 +149,44 @@ function f%d() {
 <div>
   <script>
     $(document).ready(function(){
-      $("#graph%d").load("{{site.baseurl}}%s/%s-graph-%d.html");
+      $("#asset%d").load("{{site.baseurl}}%s/%s-asset-%d.html");
     });
   </script>
 </div>
-<div id = "graph%d"></div>\n""" % (count, assets_internal, title, count, count))
+<div id = "asset%d"></div>\n""" % (count, assets_internal, title, count, count))
 
-def add_graph_code(block, count):
-  code_file.write(block)
-  code_file.write("io.write_html(fig, str(folder_path.joinpath('%s-graph-%d.html')), full_html = False, include_plotlyjs = False, config = {'displayModeBar': False})\n\n" % (title, count))
+def add_plotly_code(block, count):
+    code_file.write(block)
+    code_file.write("io.write_html(fig, str(folder_path.joinpath('%s-asset-%d.html')), full_html = False, include_plotlyjs = False, config = {'displayModeBar': False})\n\n" % (title, count))
+
+def add_dataframe_code(block, count):
+    block = block.strip()
+    block += ".to_html(str(folder_path.joinpath('%s-asset-%d.html')))\n\n" % (title, count)
+    code_file.write(block)
+
+def add_stargazer_code(block, code):
+    block = block.strip()
+    last_line = block.split('\n')[-1]
+    block += '\n\n'
+
+    block += "_sg_html = %s.render_html()\n" % last_line
+    block += "_sg_file = open(str(folder_path.joinpath('%s-asset-%d.html')), 'w')\n" % (title, count)
+    block += "_sg_file.write(_sg_html)\n"
+    block += "_sg_file.close()\n\n"
+    code_file.write(block)
 
 count = 1
 code_block = False
 code_metadata = False
 block_text = ''
 block_code = ''
+
+PLOTLY = 0
+STARGAZER = 1
+DATAFRAME = 2
+block_tyep_max = 10
+block_type = block_tyep_max
+
 for line in file:
     if code_metadata: 
         if line[:3] == '---':
@@ -181,16 +204,31 @@ for line in file:
         
         elif line[:3] == '```':
             code_block = False
+            if block_type == PLOTLY:
+                add_plotly_code(block_code, count)
+            elif block_type == STARGAZER:
+                add_stargazer_code(block_code, count)
+            elif block_type == DATAFRAME:
+                add_dataframe_code(block_code, count)
+            else:
+                code_file.write(block_code)
             add_code_end(block_text, count)
-            add_graph_code(block_code, count)
             count += 1
             block_text = ''
             block_code = ''
+            block_type = block_tyep_max
 
         else:
-            if not line[0] == ':':
-                if not 'fig.show' in line:
-                    block_code += line
+            if block_type > STARGAZER and 'Stargazer' in line:
+                block_type = STARGAZER
+            elif block_type > DATAFRAME and 'DataFrame' in line:
+                block_type = DATAFRAME
+
+            if block_type > PLOTLY and 'fig.show' in line:
+                block_text += line
+                block_type = PLOTLY
+            elif not line[0] == ':':
+                block_code += line
                 block_text += line
 
     elif line[:3] != '+++':
@@ -198,6 +236,8 @@ for line in file:
 
 code_file.close()
 out_file.close()
+
+# subprocess.run(['rm', 'temp.md'])
 subprocess.run(['python', 'make_graphs.py'])
 
 
