@@ -1,20 +1,18 @@
 ---
-layout: post
-current: post
-cover: 
-navigation: True
-title: To minimize poverty, should UBI be provided for adults, children, or both?
-date: 2020-07-07
-tags: [blog]
-class: post-template
-subclass: 'post'
-author: nate
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.10.2
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
 ---
 
-<head>
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-</head>
++++ {"colab_type": "text", "id": "VrHryGdJc0aH"}
+
 # To minimize poverty, should UBI be provided for adults, children, or both?
 
 *By Nate Golden, 2020-07-07*
@@ -29,7 +27,7 @@ I examine the poverty rate impacts of three different basic income programs:
 * Child Allowance - provides families monthly stipends based only on how many children are in their household.
 * All UBI - provides an equal monthly stipend to all Americans regardless of age (parents would receive it on behalf of their children).
 
-Two years ago, Matt Bruenig produced a similar  [paper](https://www.peoplespolicyproject.org/2018/11/29/a-child-allowance-would-be-very-effective-at-poverty-reduction/) using 2017 data in which he compared the same three programs and their impact on the poverty rate up to \\$500 billion in new spending. Bruenig found that at all levels of spending up to \\$500 billion, a Child Allowance was the most effective program at reducing poverty. This paper considers new spending up to \\$1 trillion with updated data from 2018.
+Two years ago, Matt Bruenig produced a similar  [paper](https://www.peoplespolicyproject.org/2018/11/29/a-child-allowance-would-be-very-effective-at-poverty-reduction/) using 2017 data in which he compared the same three programs and their impact on the poverty rate up to \$500 billion in new spending. Bruenig found that at all levels of spending up to \$500 billion, a Child Allowance was the most effective program at reducing poverty. This paper considers new spending up to \$1 trillion with updated data from 2018.
 
 ## Background
 
@@ -41,16 +39,18 @@ In 2018, 12.7 percent of Americans were in poverty, including 13.6 percent of ch
 
 ## Results
 
-A Child Allowance reduces overall poverty more than the other two designs, for spending up to \\$500 billion; this aligns with Bruenig's results. However, at levels beyond \\$500 billion, a UBI that includes everyone cuts overall poverty more.
+A Child Allowance reduces overall poverty more than the other two designs, for spending up to \$500 billion; this aligns with Bruenig's results. However, at levels beyond \$500 billion, a UBI that includes everyone cuts overall poverty more.
 
-Spending \\$100 billion on a Child Allowance would equate to monthly stipends of \\$114 per child and lift 4.5 million Americans (1.3 million children and 3.2 million adults) out of poverty. \\$500 billion on either a Child Allowance or All UBI would lift 12 million Americans out of poverty. Spending \\$1 trillion on an All UBI would equate to monthly checks of \\$258 per American and lift over 22 million people out of poverty.
+Spending \$100 billion on a Child Allowance would equate to monthly stipends of \$114 per child and lift 4.5 million Americans (1.3 million children and 3.2 million adults) out of poverty. \$500 billion on either a Child Allowance or All UBI would lift 12 million Americans out of poverty. Spending \$1 trillion on an All UBI would equate to monthly checks of \$258 per American and lift over 22 million people out of poverty.
 
 The interactive graph below shows the poverty impacts of each program at different funding levels.
 
-<button onclick="f1()">Click to show code</button>
-<div id="code_graph1" style="display: none;">
-  <pre>
-    <code>
+```{code-cell} ipython3
+:colab: {}
+:colab_type: code
+:id: MnyLVJO1cpwF
+:tags: [hide-input]
+
 ### LOAD PACKAGES ####
 
 import pandas as pd
@@ -197,14 +197,14 @@ program = (pd.melt(overall_df, 'spending_in_billions',
                    var_name='ubi_type',value_name='poverty_rate'))
 
 def melt_dict(d):
-  ''' produce long version of data frame represented by dictionary (d).
+  """ produce long version of data frame represented by dictionary (d).
   
   Arguments
   d: Dictionary where each element represents a differnt UBI type and spending levels and the poverty impacts.
   
   Returns
   DataFrame where every row is the combination of UBI type and spending level.
-  '''
+  """
   df = pd.DataFrame(d).round(3) * 100
   program = pd.melt(df, 'spending_in_billions', var_name='ubi_type',value_name='poverty_rate')
   program['ubi_type'] = program.ubi_type.map({'child_allowance': 'Child allowance',
@@ -217,7 +217,7 @@ program_child = melt_dict(child)
 program_adult = melt_dict(adult)
 
 def line_graph(df, x, y, color, title, xaxis_title, yaxis_title):
-    '''Style for line graphs.
+    """Style for line graphs.
     
     Arguments
     df: DataFrame with data to be plotted.
@@ -229,7 +229,7 @@ def line_graph(df, x, y, color, title, xaxis_title, yaxis_title):
     
     Returns
     Nothing. Shows the plot.
-    '''
+    """
     fig = px.line(df, x=x, y=y, color=color)
     fig.update_layout(
         title=title,
@@ -254,102 +254,48 @@ fig = line_graph(df=program_overall, x='spending_in_billions',
            title='Overall poverty rate and spending on cash transfer programs',
            xaxis_title='Spending in billions',
            yaxis_title='SPM poverty rate')
+```
 
-    </code>
-  </pre>
-</div>
+Unsurprisingly, a Child Allowance was the most effective program at reducing child poverty at all levels of spending. Spending \$400 billion on a Child Allowance cuts child poverty by over two-thirds, from 13.6 percent to 4.3 percent.
 
-<script>
-function f1() {
-  var x = document.getElementById("code_graph1");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-}
-</script> 
+Comparatively, spending \$1 trillion on an Adult UBI leaves 7 percent of children still in poverty. For an All UBI and a Child Allowance under the same spending, 4 percent and 1 percent of children would remain in poverty, respectively.
 
-<div>
-  <script>
-    $(document).ready(function(){
-      $("#graph1").load("{{site.baseurl}}assets/graphs/2020-07-07-adult-child-ubi-graph1.html");
-    });
-  </script>
-</div>
-<div id = "graph1"></div>
-Unsurprisingly, a Child Allowance was the most effective program at reducing child poverty at all levels of spending. Spending \\$400 billion on a Child Allowance cuts child poverty by over two-thirds, from 13.6 percent to 4.3 percent.
-
-Comparatively, spending \\$1 trillion on an Adult UBI leaves 7 percent of children still in poverty. For an All UBI and a Child Allowance under the same spending, 4 percent and 1 percent of children would remain in poverty, respectively.
-
-<button onclick="f2()">Click to show code</button>
-<div id="code_graph2" style="display: none;">
-  <pre>
-    <code>
+```{code-cell} ipython3
+---
+colab:
+  base_uri: https://localhost:8080/
+  height: 542
+colab_type: code
+id: -zvU7uVijyh-
+outputId: cc7e724b-a6da-49af-9b24-e84945bb0584
+tags: [hide-input]
+---
 fig = line_graph(df=program_child, x='spending_in_billions', 
            y='poverty_rate', color='ubi_type',
            title='Child poverty rate and spending on cash transfer programs',
            xaxis_title='Spending in billions',
            yaxis_title='SPM poverty rate among people aged 17 and under')
+```
 
-    </code>
-  </pre>
-</div>
-
-<script>
-function f2() {
-  var x = document.getElementById("code_graph2");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-}
-</script> 
-
-<div>
-  <script>
-    $(document).ready(function(){
-      $("#graph2").load("{{site.baseurl}}assets/graphs/2020-07-07-adult-child-ubi-graph2.html");
-    });
-  </script>
-</div>
-<div id = "graph2"></div>
 An Adult UBI and an All UBI have nearly identical effects on the adult poverty rate. A Child Allowance has a smaller impact on adult poverty because the benefits only go to adults with children in their family.
 
-<button onclick="f3()">Click to show code</button>
-<div id="code_graph3" style="display: none;">
-  <pre>
-    <code>
+```{code-cell} ipython3
+---
+colab:
+  base_uri: https://localhost:8080/
+  height: 542
+colab_type: code
+id: ktqPlfkAliW_
+outputId: 2ecab6b3-0b5a-4395-89ad-6a7b60f7a33c
+tags: [hide-input]
+---
 fig = line_graph(df=program_adult, x='spending_in_billions', 
            y='poverty_rate', color='ubi_type',
            title='Adult poverty rate and spending on cash transfer programs',
            xaxis_title='Spending in billions',
            yaxis_title='SPM poverty rate among people aged 18 and over')
+```
 
-    </code>
-  </pre>
-</div>
-
-<script>
-function f3() {
-  var x = document.getElementById("code_graph3");
-  if (x.style.display === "none") {
-    x.style.display = "block";
-  } else {
-    x.style.display = "none";
-  }
-}
-</script> 
-
-<div>
-  <script>
-    $(document).ready(function(){
-      $("#graph3").load("{{site.baseurl}}assets/graphs/2020-07-07-adult-child-ubi-graph3.html");
-    });
-  </script>
-</div>
-<div id = "graph3"></div>
 ## Conclusion
 This analysis finds that (a) including children in basic income plans enhances their anti-poverty effects and (b) optimal policy depends on spending levels.
 
