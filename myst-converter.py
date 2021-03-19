@@ -76,7 +76,12 @@ author:
 """
 
 # convert notebook to myst
-subprocess.run(['jupytext', notebook_path, '--to', 'myst', '-o', 'temp.md'])
+myst_file = ''
+temp_num = 1
+while Path('temp%d.md' % temp_num).exists():
+    temp_num += 1
+myst_file = 'temp%d.md' % temp_num
+subprocess.run(['jupytext', notebook_path, '--to', 'myst', '-o', myst_file])
 
 # open myst file
 file = open('temp.md', 'r') 
@@ -117,14 +122,17 @@ code_file.write('from pathlib import Path\n')
 code_file.write("\nfolder_path = Path('%s')\n" % assets_dir)
 # code_file.write("\nfolder_path.mkdir(parents = True, exist_ok = True)\n")
 
+def clean_text(text):
+    return text.replace('\\$', '$')
+
 # code prefix
 def add_code_start(count):
   out_file.write("""
-<button onclick="f%d()">Click to show code</button>
-<div id="asset_code_%d" style="display: none;">
+<button class="code-button" id="button%d" onclick="f%d()">&#9654; Click to show code</button>
+<div class="code-cell" id="asset_code_%d" style="display: none;">
   <pre>
     <code>
-""" % (count, count))
+""" % (count, count, count))
 
 # code postfix
 def add_code_end(block, count):
@@ -137,13 +145,16 @@ def add_code_end(block, count):
 <script>
 function f%d() {
   var x = document.getElementById("asset_code_%d");
+  var b = document.getElementById("button%d");
   if (x.style.display === "none") {
     x.style.display = "block";
+    b.innerHTML = "&#9660 Click to hide code";
   } else {
     x.style.display = "none";
+    b.innerHTML = "&#9654 Click to show code";
   }
 }
-</script> \n""" % (count, count))
+</script> \n""" % (count, count, count))
 
     out_file.write("""
 <div>
@@ -194,7 +205,7 @@ for line in file:
 
     elif line[:14] == '```{code-cell}':
         code_block = True
-        out_file.write(block_text)
+        out_file.write(clean_text(block_text))
         block_text = ''
         add_code_start(count)
 
@@ -237,7 +248,7 @@ for line in file:
 code_file.close()
 out_file.close()
 
-# subprocess.run(['rm', 'temp.md'])
+subprocess.run(['rm', myst_file])
 subprocess.run(['python', 'make_graphs.py'])
 
 
