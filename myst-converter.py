@@ -21,10 +21,12 @@ format = "%Y-%m-%d"
 # check that the title begins with a proper datetime; this is required by jekyll. 
 # eg, 2020-01-02 for January 2, 2020
 # 2020-1-2 also works in jekyll but not here, but it's easier to just require the zeros here
+add_date = False
 try:
     datetime.datetime.strptime(title[:10], format)
 except:
-    raise ValueError('File name must start with a date in the format YYYY-MM-DD')
+    # raise ValueError('File name must start with a date in the format YYYY-MM-DD')
+    add_date = True
 
 # set up the output directories for the markdown file and the graphs, respectively
 assets_dir = Path()
@@ -84,28 +86,40 @@ myst_file = 'temp%d.md' % temp_num
 subprocess.run(['jupytext', notebook_path, '--to', 'myst', '-o', myst_file])
 
 # open myst file
-file = open('temp.md', 'r') 
+file = open(myst_file, 'r') 
 
 # update the title if necessary to make it meet jekyll requirements
 title = title.replace('_', '-')
+
+date = None
+metadata_store = ''
+metadata_found = False
+for line in file:
+    if add_date and 'date' in line:
+        date = datetime.datetime.strptime(line[6:].strip(), format)
+    # metadata is not included
+    if line == '+++':
+        metadata_store = metadata
+    elif metadata_found:
+        if line[:3] == '%%%':
+            metadata_store += '---\n'
+            break
+        metadata_store += line
+    elif line[:3] == '%%%':
+        metadata_found = True
+        metadata_store += '---\n'
+
+if add_date:
+    if date == None:
+        raise ValueError('File name must start with a date or include a date in metadata in the format YYYY-MM-DD')
+    else:
+        title = str(date.date()) + '-' + title
 
 # open output file
 out_file = open(markdown_dir.joinpath('%s.md' % title), 'w')
 # out_file.write('---\n')
 
-metadata_found = False
-for line in file:
-    # metadata is not included
-    if line == '+++':
-        out_file.write(metadata)
-    elif metadata_found:
-        if line[:3] == '%%%':
-            out_file.write('---\n')
-            break
-        out_file.write(line)
-    elif line[:3] == '%%%':
-        metadata_found = True
-        out_file.write('---\n')
+out_file.write(metadata_store)
 
 out_file.write(
 """
@@ -250,6 +264,9 @@ out_file.close()
 
 subprocess.run(['rm', myst_file])
 subprocess.run(['python', 'make_graphs.py'])
+subprocess.run(['rm', 'make_graphs.py'])
+
+print('---------------- Task %s completed successfully -------------------\n\n\n' % title)
 
 
 
