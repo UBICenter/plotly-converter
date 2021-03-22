@@ -182,7 +182,7 @@ function f%d() {
 
 def add_plotly_code(block, count):
     code_file.write(block)
-    code_file.write("io.write_html(fig, str(folder_path.joinpath('%s-asset-%d.html')), full_html = False, include_plotlyjs = False, config = {'displayModeBar': False})\n\n" % (title, count))
+    code_file.write("io.write_html(fig, str(folder_path.joinpath('%s-asset-%d.html')), full_html = False, include_plotlyjs = False, config = {'displayModeBar': False, 'responsive': True})\n\n" % (title, count))
 
 def add_dataframe_code(block, count):
     block = block.strip()
@@ -258,6 +258,9 @@ for line in file:
 
     elif line[:3] != '+++':
         block_text += line
+
+if len(block_text) > 0:
+    out_file.write(clean_text(block_text))
 
 code_file.close()
 out_file.close()
