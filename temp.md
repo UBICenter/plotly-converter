@@ -1,7 +1,62 @@
-import plotly.io as io
-from pathlib import Path
+---
+jupytext:
+  text_representation:
+    extension: .md
+    format_name: myst
+    format_version: 0.13
+    jupytext_version: 1.10.2
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
 
-folder_path = Path('/Users/mattgilbert/Documents/UBIcenter/ubicenter.org/assets/markdown_assets/2021-01-18_racial_poverty_disparities_mlk_day_2021')
+%%% metadata
+layout: post
+current: post
+cover: 
+navigation: True
+title: Basic income would shrink racial poverty disparities
+date: 2021-01-18
+tags: [blog, race, mlk]
+class: post-template
+subclass: 'post'
+author: [max, connor, nate]
+%%%
+
++++
+
+Dr. Martin Luther King Jr. is remembered chiefly for his leadership of the civil rights movement,
+but toward the end of his life, King extended this leadership to the cause of poverty.
+In his [final book](http://www.thekinglegacy.org/books/where-do-we-go-here-chaos-or-community),
+he wrote:
+
+```{epigraph}
+The time has come for us to civilize ourselves by the total, direct and immediate abolition of poverty [...] 
+I'm now convinced that the simplest approach will prove to be the most effective — the solution to poverty is to abolish it directly by a now widely discussed measure: the guaranteed income.
+
+-- Dr. Martin Luther King, Jr., *Where Do We Go From Here: Chaos or Community?* (1967)
+```
+
+We honor King's call by showing how a universal basic income (UBI), funded by a flat income tax, would not only reduce overall poverty, but also shrink the poverty disparities between Black and White people.
+
+
+:::{admonition,dropdown,tip} Modeling notes
+Data was gathered from the US Census Bureau's March Supplement, which covers economic circumstances in 2019.
+We use the Supplemental Poverty Measure, which incorporates taxes and transfers (including in-kind benefits like SNAP),
+and adjusts for local housing costs.
+The flat income tax is applied on positive adjusted gross income.
+We calculate per-capita poverty gaps by race as the total poverty gap of SPM units with at least one person of that race, divided by the number of people in SPM units with at least one person of that race.
+:::
+
+
+Black Americans today are 75 percent more likely to be in poverty than White Americans, with a rate of 18.4 percent compared to 10.5 percent.
+A \$250 monthly UBI would cut both Black and White poverty roughly in half (this is similar to what we found in a [July 2020 post](https://medium.com/ubicenter/how-universal-basic-income-would-affect-the-black-white-poverty-and-wealth-gaps-452e2af1497b), which used older data and did not simulate taxes to fund the UBI).
+A \$1,000 monthly UBI funded by a flat income tax would reduce poverty for both White and Black people to about 1 percent.
+
+```{code-cell} ipython3
+:id: oka84z9v8vbI
+:tags: [hide-input]
 
 import pandas as pd
 import numpy as np
@@ -189,8 +244,26 @@ fig = line_graph(
     yaxis_ticksuffix="%",
     yaxis_tickprefix="",
 )
-io.write_html(fig, str(folder_path.joinpath('2021-01-18-racial-poverty-disparities-mlk-day-2021-asset-1.html')), full_html = False, include_plotlyjs = False, config = {'displayModeBar': False})
+fig.show(config=CONFIG)
+```
 
+The poverty rate only tells part of the story, though.
+When someone goes from deep in poverty to just below the poverty line, the poverty rate is left unchanged, despite the person's material conditions improving.
+
+An alternative measure is the *poverty gap*, which aggregates each household's difference between its resources and its poverty threshold. This counts improvements of people who remain in poverty, and can be thought of as the total amount of money required to lift everyone out of poverty, if that money could be perfectly targeted.
+
+Applying this measure and adjusting for population differences, the Black poverty gap exceeds the White poverty gap by 50 percent: \$654 per person, vs. \$434 per person.
+Given a \$250 monthly UBI, which cuts poverty rates in half, poverty gaps also fall by about half, and the difference falls such that the Black poverty gap is about 36 percent higher.
+For UBIs above \$600 per month, the Black poverty gap even falls below the White poverty gap, likely due to Black people living in areas with lower-cost housing.
+
+```{code-cell} ipython3
+---
+colab:
+  base_uri: https://localhost:8080/
+id: RbR-ZGHoDkx6
+outputId: 95c6e91c-de7e-4c00-8f7b-e663316ac2e7
+tags: [hide-input]
+---
 fig = line_graph(
     df=summary,
     x="monthly_ubi",
@@ -203,8 +276,19 @@ fig = line_graph(
     yaxis_ticksuffix="",
     yaxis_tickprefix="$",
 )
-io.write_html(fig, str(folder_path.joinpath('2021-01-18-racial-poverty-disparities-mlk-day-2021-asset-2.html')), full_html = False, include_plotlyjs = False, config = {'displayModeBar': False})
+fig.show(config=CONFIG)
+```
 
+Viewing these together, it's clear that UBIs don't only reduce poverty rates and poverty gaps for both races, but also bring them closer together, reducing racial disparities in poverty.
+
+```{code-cell} ipython3
+---
+colab:
+  base_uri: https://localhost:8080/
+id: u_mQFugH_TuF
+outputId: c3fe50ea-a5c5-4135-95e3-1fb66d7d8b83
+tags: [hide-input]
+---
 fig = line_graph(
     df=ratios,
     x="monthly_ubi",
@@ -219,5 +303,8 @@ fig = line_graph(
     yaxis_tickprefix="",
 )
 fig.add_hline(1, line_dash="dot")
-io.write_html(fig, str(folder_path.joinpath('2021-01-18-racial-poverty-disparities-mlk-day-2021-asset-3.html')), full_html = False, include_plotlyjs = False, config = {'displayModeBar': False})
+fig.show(config=CONFIG)
+```
 
+Dr. King didn't live to see today's renaissance of guaranteed income, with pandemic responses including [generous unconditional cash transfers](https://www.cbsnews.com/news/stimulus-check-600-2000-dollars-eligibility-2021-1-1/), [mayors across America](http://mayorsforagi.org) calling for pilots, and [leaders across the world](https://www.express.co.uk/news/politics/1316702/nicola-sturgeon-news-scotland-ubi-Universal-Basic-Income-SNP-latest-economy) embracing the idea.
+But our analysis validates his intuition and the intertwining of his racial justice and economic justice emphases: guaranteed income will produce not only a less impoverished world, but also a less racially disparate one.
